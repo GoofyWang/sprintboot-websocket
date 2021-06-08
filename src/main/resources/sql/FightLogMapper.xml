@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+    <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dh.dao.FightLogMapper" >
+<resultMap id="BaseResultMap" type="com.dh.model.FightLog" >
+  <id column="fight_id" property="FightId" jdbcType="INTEGER" />
+  <result column="match_id" property="MatchId" jdbcType="INTEGER" />
+  <result column="room_id" property="RoomId" jdbcType="INTEGER" />
+  <result column="employee_id" property="EmployeeId" jdbcType="INTEGER" />
+  <result column="item_bank_id" property="ItemBankId" jdbcType="INTEGER" />
+  <result column="answer_time" property="AnswerTime" jdbcType="INTEGER" />
+  <result column="status" property="Status" jdbcType="INTEGER" />
+  <result column="createTime" property="CreateTime" jdbcType="TIMESTAMP" />
+</resultMap>
+
+  <insert id="createFightLog" parameterType="com.dh.model.FightLog"
+      useGeneratedKeys="true" keyProperty="FightId"
+  >
+    insert into fight_log
+    (match_id,
+    room_id,
+    employee_id,
+    item_bank_id,
+    answer_time,
+    status)
+    values (
+    #{MatchId,jdbcType=INTEGER},
+    #{RoomId,jdbcType=INTEGER},
+    #{EmployeeId,jdbcType=INTEGER},
+    #{ItemBankId,jdbcType=INTEGER},
+    #{AnswerTime,jdbcType=INTEGER},
+    #{Status,jdbcType=INTEGER}
+    )
+  </insert>
+
+  <select id="getFightLogByMatchId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select fight_id,match_id,room_id,employee_id,item_bank_id,answer_time,status,create_time
+    from fight_log
+    where match_id = #{MatchId,jdbcType=INTEGER}
+  </select>
+
+</mapper>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dh.dao.AnswerMapper" >
+  <resultMap id="BaseResultMap" type="com.dh.model.Answer" >
+    <id column="answer_id" property="answerId" jdbcType="INTEGER" />
+    <result column="item_bank_id" property="itemBankId" jdbcType="INTEGER" />
+    <result column="answer_content" property="answerContent" jdbcType="VARCHAR" />
+    <result column="answer_status" property="answerStatus" jdbcType="CHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    answer_id, item_bank_id, answer_content, answer_status
+  </sql>
+  
+  <!-- 根据试题标识ids获取试题答案记录 -->
+  <select id="getAnswerListByItembankIds" resultMap="BaseResultMap" parameterType="java.util.List">
+  	select answer_id, item_bank_id, answer_content, answer_status from answer 
+  	where item_bank_id in 
+  	<foreach collection="list" item="item" open="(" close=")" separator=",">
+  		#{item}
+  	</foreach>
+  </select>
+
+
+   <select id="getAnswerListByItembankId" resultMap="BaseResultMap" parameterType="java.util.List">
+  	select answer_id, item_bank_id, answer_content, answer_status from answer
+  	where item_bank_id = #{itemBankId,jdbcType=INTEGER}
+  </select>
+
+  <!-- 根据试题标识删除答案信息 -->
+  <delete id="deleteAnswerByItemBankId" parameterType="java.lang.Integer" >
+    delete from answer
+    where item_bank_id = #{itemBankId,jdbcType=INTEGER}
+  </delete>
+  
+  <!-- 添加答案信息 -->
+  <insert id="insert">
+    insert into answer (item_bank_id, answer_content, answer_status) values 
+    <foreach collection="list" item="item" separator=",">
+    	(#{itemBankId}, #{item.answerContent}, #{item.answerStatus})
+    </foreach>
+  </insert>
+  
+</mapper>

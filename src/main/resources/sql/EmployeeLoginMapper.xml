@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dh.dao.EmployeeLoginMapper" >
+  <resultMap id="BaseResultMap" type="com.dh.model.EmployeeLogin" >
+    <id column="employee_login_id" property="employeeLoginId" jdbcType="INTEGER" />
+    <result column="employee_id" property="employeeId" jdbcType="INTEGER" />
+    <result column="employee_login_token" property="employeeLoginToken" jdbcType="VARCHAR" />
+    <result column="employee_login_ip" property="employeeLoginIp" jdbcType="VARCHAR" />
+    <result column="employee_login_status" property="employeeLoginStatus" jdbcType="CHAR" />
+    <result column="employee_login_type" property="employeeLoginType" jdbcType="CHAR" />
+    <result column="create_time" property="createTime" jdbcType="CHAR" />
+    <result column="update_time" property="updateTime" jdbcType="CHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    employee_login_id, employee_id, employee_login_token, employee_login_ip, employee_login_status, 
+    employee_login_type, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from employee_login
+    where employee_login_id = #{employeeLoginId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from employee_login
+    where employee_login_id = #{employeeLoginId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.dh.model.EmployeeLogin" >
+    insert into employee_login (employee_login_id, employee_id, employee_login_token, 
+      employee_login_ip, employee_login_status, employee_login_type, 
+      create_time, update_time)
+    values (#{employeeLoginId,jdbcType=INTEGER}, #{employeeId,jdbcType=INTEGER}, #{employeeLoginToken,jdbcType=VARCHAR}, 
+      #{employeeLoginIp,jdbcType=VARCHAR}, #{employeeLoginStatus,jdbcType=CHAR}, #{employeeLoginType,jdbcType=CHAR}, 
+      #{createTime,jdbcType=CHAR}, #{updateTime,jdbcType=CHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.dh.model.EmployeeLogin" >
+    insert into employee_login
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="employeeLoginId != null" >
+        employee_login_id,
+      </if>
+      <if test="employeeId != null" >
+        employee_id,
+      </if>
+      <if test="employeeLoginToken != null and employeeLoginToken != ''" >
+        employee_login_token,
+      </if>
+      <if test="employeeLoginIp != null and employeeLoginIp != ''" >
+        employee_login_ip,
+      </if>
+      <if test="employeeLoginStatus != null and employeeLoginStatus != ''" >
+        employee_login_status,
+      </if>
+      <if test="employeeLoginType != null and employeeLoginType != ''" >
+        employee_login_type,
+      </if>
+      <if test="createTime != null and createTime != ''" >
+        create_time,
+      </if>
+      <if test="updateTime != null and updateTime != ''" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="employeeLoginId != null" >
+        #{employeeLoginId,jdbcType=INTEGER},
+      </if>
+      <if test="employeeId != null" >
+        #{employeeId,jdbcType=INTEGER},
+      </if>
+      <if test="employeeLoginToken != null and updateTime != ''" >
+        #{employeeLoginToken,jdbcType=VARCHAR},
+      </if>
+      <if test="employeeLoginIp != null and updateTime != ''" >
+        #{employeeLoginIp,jdbcType=VARCHAR},
+      </if>
+      <if test="employeeLoginStatus != null and updateTime != ''" >
+        #{employeeLoginStatus,jdbcType=CHAR},
+      </if>
+      <if test="employeeLoginType != null and updateTime != ''" >
+        #{employeeLoginType,jdbcType=CHAR},
+      </if>
+      <if test="createTime != null and updateTime != ''" >
+        #{createTime,jdbcType=CHAR},
+      </if>
+      <if test="updateTime != null and updateTime != ''" >
+        #{updateTime,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.dh.model.EmployeeLogin" >
+    update employee_login
+    <set >
+      <if test="employeeLoginToken != null and employeeLoginToken != ''" >
+        employee_login_token = #{employeeLoginToken,jdbcType=VARCHAR},
+      </if>
+      <if test="employeeLoginIp != null and employeeLoginIp != ''" >
+        employee_login_ip = #{employeeLoginIp,jdbcType=VARCHAR},
+      </if>
+      <if test="employeeLoginStatus != null and employeeLoginStatus != ''" >
+        employee_login_status = #{employeeLoginStatus,jdbcType=CHAR},
+      </if>
+      <if test="employeeLoginType != null and employeeLoginType != ''" >
+        employee_login_type = #{employeeLoginType,jdbcType=CHAR},
+      </if>
+      <if test="createTime != null and createTime != ''" >
+        create_time = #{createTime,jdbcType=CHAR},
+      </if>
+      <if test="updateTime != null and updateTime != ''" >
+        update_time = #{updateTime,jdbcType=CHAR},
+      </if>
+    </set>
+    where employee_id = #{employeeId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.dh.model.EmployeeLogin" >
+    update employee_login
+    set employee_id = #{employeeId,jdbcType=INTEGER},
+      employee_login_token = #{employeeLoginToken,jdbcType=VARCHAR},
+      employee_login_ip = #{employeeLoginIp,jdbcType=VARCHAR},
+      employee_login_status = #{employeeLoginStatus,jdbcType=CHAR},
+      employee_login_type = #{employeeLoginType,jdbcType=CHAR},
+      create_time = #{createTime,jdbcType=CHAR},
+      update_time = #{updateTime,jdbcType=CHAR}
+    where employee_login_id = #{employeeLoginId,jdbcType=INTEGER}
+  </update>
+</mapper>

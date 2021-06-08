@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dh.dao.AnswerRecordMapper" >
+  <resultMap id="BaseResultMap" type="com.dh.model.AnswerRecord" >
+    <id column="ar_id" property="arId" jdbcType="INTEGER" />
+    <result column="employee_id" property="employeeId" jdbcType="INTEGER" />
+    <result column="item_bank_id" property="itemBankId" jdbcType="INTEGER" />
+    <result column="ar_employee_anwer" property="arEmployeeAnwer" jdbcType="VARCHAR" />
+    <result column="ar_real_answer" property="arRealAnswer" jdbcType="VARCHAR" />
+    <result column="ar_status" property="arStatus" jdbcType="CHAR" />
+    <result column="ar_number" property="arNumber" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="CHAR" />
+    <result column="update_time" property="updateTime" jdbcType="CHAR" />
+    <result column="status" property="status" jdbcType="CHAR" />
+  </resultMap>
+  
+  <resultMap id="EmployeeFalseItemBankVO" type="com.dh.model.vo.EmployeeFalseItemBankVO" >
+    <result column="item_bank_id" property="itemBankId" jdbcType="INTEGER" />
+    <result column="item_bank_title" property="itemBankTitle" jdbcType="VARCHAR" />
+    <result column="item_bank_analysis" property="itemBankAnalysis" jdbcType="VARCHAR" />
+    <result column="ar_employee_anwer" property="employeeAnswer" jdbcType="VARCHAR" />
+    <result column="item_bank_type" property="itemBankType" jdbcType="CHAR" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    ar_id, employee_id, item_bank_id, ar_employee_anwer, ar_real_answer, ar_status, ar_number, 
+    create_time, update_time, status
+  </sql>
+  
+  <!-- 根据员工标识获取错题信息 -->
+  <select id="getEmployeeFalseItemBankList" resultMap="EmployeeFalseItemBankVO" parameterType="java.lang.Integer">
+  	select ib.item_bank_id, ib.item_bank_title, ib.item_bank_analysis, ib.item_bank_type, ar.ar_employee_anwer
+	from answer_record ar inner join item_bank ib on ar.item_bank_id = ib.item_bank_id
+	where employee_id = #{employeeId} and ar_status = 'N' and ib.status = 'Y' and ar.status = 'Y'
+  </select>
+  
+  <!-- 根据员工标识获取员工答题记录 -->
+  <select id="getAnswerRecordByEmployeeId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+  	select ar_id, employee_id, ar_status from answer_record
+  	where employee_id = #{employeeId} and status = 'Y'
+  </select>
+  
+  <!-- 获取答题记录list -->
+  <select id="getAnswerRecordList" resultMap="BaseResultMap">
+  	select 
+    <include refid="Base_Column_List" />
+    from answer_record where employee_id = #{employeeId} and item_bank_id in
+    <foreach collection="list" item="item" open="(" close=")" separator=",">
+    	#{item}
+    </foreach>
+     and status = 'Y'
+  </select>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from answer_record
+    where ar_id = #{arId,jdbcType=INTEGER}
+  </select>
+  
+  <!-- 删除答题记录 -->
+  <delete id="deleteAnswerRecordByIds" parameterType="java.util.List" >
+    delete from answer_record where ar_id in
+    <foreach collection="list" item="item" open="(" close=")" separator=",">
+    	#{item}
+    </foreach>
+  </delete>
+  
+  <!-- 添加答题记录 -->
+  <insert id="insertAnswerRecord" parameterType="java.util.List" >
+    insert into answer_record (employee_id, item_bank_id, ar_employee_anwer, ar_real_answer,
+        ar_status, ar_number, create_time, update_time, status) values
+    <foreach collection="list" item="item" separator=",">
+      (#{item.employeeId,jdbcType=INTEGER}, #{item.itemBankId,jdbcType=INTEGER}, #{item.arEmployeeAnwer,jdbcType=VARCHAR},
+      #{item.arRealAnswer,jdbcType=VARCHAR}, #{item.arStatus,jdbcType=CHAR}, #{item.arNumber,jdbcType=INTEGER}, 
+      #{item.createTime,jdbcType=CHAR}, #{item.updateTime,jdbcType=CHAR}, #{item.status,jdbcType=CHAR})
+    </foreach>
+  </insert>
+  
+</mapper>

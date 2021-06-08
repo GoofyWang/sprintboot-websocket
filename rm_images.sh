@@ -1,1 +1,1 @@
-docker rmi suyu/springbootwebsocket:v1.0.0
+docker rmi dhplay/springbootwebsocket:v1.0.0

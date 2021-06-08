@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dh.dao.EmployeeScoreRecordMapper" >
+  <resultMap id="BaseResultMap" type="com.dh.model.EmployeeScoreRecord" >
+    <id column="esr_id" property="esrId" jdbcType="INTEGER" />
+    <result column="employee_id" property="employeeId" jdbcType="INTEGER" />
+    <result column="esr_score" property="esrScore" jdbcType="INTEGER" />
+    <result column="esr_type_name" property="esrTypeName" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="CHAR" />
+    <result column="status" property="status" jdbcType="CHAR" />
+  </resultMap>
+  
+  <resultMap id="EmployeeScoreRecordVO" type="com.dh.model.vo.EmployeeScoreRecordVO" >
+    <result column="esr_score" property="esrScore" jdbcType="INTEGER" />
+    <result column="esr_type_name" property="esrTypeName" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="CHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    esr_id, employee_id, esr_score, esr_type_name, create_time, status
+  </sql>
+  
+  <!-- 获取员工总积分 -->
+  <select id="getEmployeeTotalScore" resultType="java.lang.Integer" parameterType="java.lang.Integer" >
+  	select sum(esr_score) from employee_score_record where employee_id = #{employeeId} and status = 'Y'
+  </select>
+  
+  <!-- 获取员工积分列表  -->
+  <select id="getEmployeeScoreRecordList" resultMap="EmployeeScoreRecordVO" parameterType="java.lang.Integer" >
+  	select esr_score, esr_type_name, create_time from employee_score_record
+  	where employee_id = #{employeeId} and status = 'Y' order by create_time desc
+  </select>
+  
+  <!-- 获取总积分前三名的员工 -->
+  <select id="getEmployeeScoreProfileList" resultType="java.util.Map">
+  	select employee_id as employeeId, sum(esr_score) as score from employee_score_record
+	group by employee_id order by score desc limit 3
+  </select>
+  
+  <!-- 添加员工积分 -->  
+  <insert id="insert" parameterType="com.dh.model.EmployeeScoreRecord" >
+    insert into employee_score_record (employee_id, esr_score, 
+      esr_type_name, create_time, status)
+    values (#{employeeId,jdbcType=INTEGER}, #{esrScore,jdbcType=INTEGER},#{esrTypeName,jdbcType=VARCHAR},  
+      #{createTime,jdbcType=CHAR}, #{status,jdbcType=CHAR})
+  </insert>
+  
+</mapper>

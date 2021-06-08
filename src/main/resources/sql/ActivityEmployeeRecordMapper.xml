@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dh.dao.ActivityEmployeeRecordMapper" >
+  <resultMap id="BaseResultMap" type="com.dh.model.ActivityEmployeeRecord" >
+    <id column="aer_id" property="aerId" jdbcType="INTEGER" />
+    <result column="activity_id" property="activityId" jdbcType="INTEGER" />
+    <result column="employee_id" property="employeeId" jdbcType="INTEGER" />
+    <result column="aer_score" property="aerScore" jdbcType="INTEGER" />
+    <result column="aer_challenge_status" property="aerChallengeStatus" jdbcType="CHAR" />
+    <result column="aer_answer_time" property="aerAnswerTime" jdbcType="INTEGER" />
+    <result column="aer_answer_date" property="aerAnswerDate" jdbcType="CHAR" />
+    <result column="create_time" property="createTime" jdbcType="CHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    aer_id, activity_id, employee_id, aer_score, aer_answer_time, aer_challenge_status, aer_answer_date, create_time
+  </sql>
+  
+  <!-- 获取当天员工答题次数 -->
+  <select id="getEmployeeAnswerCount" resultType="java.lang.Integer">
+  	select count(1) from activity_employee_record
+  	where employee_id = #{employeeId} and aer_answer_date = #{date}
+  </select>
+  
+  <!-- 获取用户活动记录 -->
+  <select id="getActivityEmployeeRecordList" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from activity_employee_record
+    where employee_id = #{employeeId,jdbcType=INTEGER}
+  </select>
+  
+  <!-- 添加活动用户记录 -->
+  <insert id="insert" parameterType="com.dh.model.ActivityEmployeeRecord" >
+    insert into activity_employee_record (activity_id, employee_id, 
+      aer_score, aer_answer_time, aer_answer_date, aer_challenge_status,
+      create_time)
+    values (#{activityId,jdbcType=INTEGER}, #{employeeId,jdbcType=INTEGER}, 
+      #{aerScore,jdbcType=INTEGER}, #{aerAnswerTime,jdbcType=INTEGER}, #{aerAnswerDate,jdbcType=CHAR}, 
+      #{aerChallengeStatus}, #{createTime,jdbcType=CHAR})
+  </insert>
+  
+</mapper>

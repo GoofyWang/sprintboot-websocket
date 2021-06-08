@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+    <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dh.dao.MatchLogMapper" >
+<resultMap id="BaseResultMap" type="com.dh.model.MatchLog" >
+  <id column="match_id" property="MatchId" jdbcType="INTEGER" />
+  <result column="room_a" property="RoomA" jdbcType="INTEGER" />
+  <result column="room_b" property="RoomB" jdbcType="INTEGER" />
+  <result column="status" property="Status" jdbcType="INTEGER" />
+  <result column="submit_num" property="submitNum" jdbcType="INTEGER" />
+  <result column="create_time" property="CreateTime" />
+</resultMap>
+
+  <insert id="createMatch" parameterType="com.dh.model.MatchLog"
+      useGeneratedKeys="true" keyProperty="MatchId"
+  >
+    insert into match_log (room_a, room_b)
+    values (#{RoomA,jdbcType=INTEGER}, #{RoomB,jdbcType=INTEGER})
+  </insert>
+
+  <select id="getMatch" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select match_id,room_a,room_b,status,create_time,submit_num
+    from match_log
+    where match_id = #{MatchId,jdbcType=INTEGER}
+  </select>
+
+  <select id="getMatchShouldCompleted" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select match_id,room_a,room_b,status,create_time,submit_num
+    from match_log
+    where status = 0 and create_time &lt; DATE_SUB(NOW(),INTERVAL 6 MINUTE)
+    limit #{Limit,jdbcType=INTEGER}
+  </select>
+
+
+  <update id="increaseSubmitNum"  parameterType="java.lang.Integer">
+    update match_log set submit_num = submit_num + 1
+    where match_id = #{MatchId,jdbcType=INTEGER}
+  </update>
+
+  <update id="finishMatch"  parameterType="java.lang.Integer">
+    update match_log set status = 1
+    where match_id = #{MatchId,jdbcType=INTEGER}
+  </update>
+
+
+</mapper>

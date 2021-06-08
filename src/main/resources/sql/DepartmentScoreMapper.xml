@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+    <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dh.dao.DepartmentScoreMapper" >
+<resultMap id="BaseResultMap" type="com.dh.model.DepartmentScore" >
+  <id column="id" property="Id" jdbcType="INTEGER" />
+  <result column="department_id" property="DepartmentId" jdbcType="INTEGER" />
+  <result column="score" property="Score" jdbcType="INTEGER" />
+  <result column="times" property="Times" jdbcType="INTEGER" />
+  <result column="update_time" property="UpdateTime" jdbcType="TIMESTAMP" />
+</resultMap>
+
+<resultMap id="withDepartment" type="com.dh.model.vo.DepartmentScoreListVO" >
+  <id column="id" property="Id" jdbcType="INTEGER" />
+  <result column="department_id" property="DepartmentId" jdbcType="INTEGER" />
+  <result column="score" property="Score" jdbcType="INTEGER" />
+  <result column="department_name" property="DepartmentName" jdbcType="VARCHAR" />
+  <result column="update_time" property="UpdateTime" jdbcType="TIMESTAMP" />
+</resultMap>
+
+  <insert id="createLog" parameterType="com.dh.model.DepartmentScore"
+      useGeneratedKeys="true" keyProperty="Id"
+  >
+    insert into department_score
+    (department_id,
+    score,
+    times)
+    values (
+    #{DepartmentId,jdbcType=INTEGER},
+    #{Score,jdbcType=INTEGER},
+    #{Times,jdbcType=INTEGER}
+    )
+  </insert>
+
+  <update id="addScore" parameterType="com.dh.model.DepartmentScore" >
+    update department_score set score = score + #{Score,jdbcType=INTEGER}, times = times + #{Times,jdbcType=INTEGER}
+    where department_id = #{departmentId,jdbcType=INTEGER}
+  </update>
+
+  <select id="getInfo" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select department_id,score,update_time
+    from department_score
+    where department_id = #{DepartmentId,jdbcType=INTEGER}
+  </select>
+
+  <select id="getList" resultMap="withDepartment" parameterType="java.lang.Integer">
+    select ds.department_id,ds.score,ds.update_time, d.department_name
+    from department_score ds left join department d on ds.department_id = d.department_id
+    order by score desc , times desc limit #{Limit,jdbcType=INTEGER}
+  </select>
+
+
+</mapper>

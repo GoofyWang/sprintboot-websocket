@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dh.dao.RoomInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.dh.model.RoomInfo" >
+    <id column="id" property="Id" jdbcType="INTEGER" />
+    <result column="room_id" property="RoomId" jdbcType="INTEGER" />
+    <result column="employee_id" property="EmployeeId" jdbcType="INTEGER" />
+    <result column="create_time" property="CreateTime" />
+  </resultMap>
+
+  <resultMap id="WithEmployeeInfo" type="com.dh.model.vo.RoomInfoVO" >
+    <id column="id" property="Id" jdbcType="INTEGER" />
+    <result column="room_id" property="RoomId" jdbcType="INTEGER" />
+    <result column="employee_id" property="EmployeeId" jdbcType="INTEGER" />
+    <result column="create_time" property="CreateTime" />
+    <result column="employee_real_name" property="EmployeeRealName"  jdbcType="VARCHAR" />
+    <result column="department_name" property="departmentName"  jdbcType="VARCHAR" />
+    <result column="employee_head_image" property="EmployeeHeadImage" jdbcType="VARCHAR" />
+    <result column="employee_sex" property="EmployeeSex" jdbcType="CHAR" />
+  </resultMap>
+
+  <select id="getRoomInfo" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select id,room_id,employee_id,create_time
+    from room_info
+    where employee_id = #{EmployeeId,jdbcType=INTEGER} limit 1
+  </select>
+
+  <select id="getRoomInfoList" resultMap="WithEmployeeInfo" parameterType="java.lang.Integer">
+    select r.id, r.room_id, r.employee_id , e.employee_real_name, e.employee_head_image, e.employee_sex, d.department_name
+    from room_info r left join employee e on r.employee_id = e.employee_id
+    left join department d on e.department_id = d.department_id
+    where room_id = #{RoomId,jdbcType=INTEGER} order by id
+  </select>
+
+  <select id="getRoomInfoListByRoomIds" resultMap="WithEmployeeInfo" parameterType="java.lang.Integer">
+    select r.id, r.room_id, r.employee_id , e.employee_real_name, e.employee_head_image, e.employee_sex, d.department_name
+    from room_info r left join employee e on r.employee_id = e.employee_id
+    left join department d on e.department_id = d.department_id
+    where room_id in
+    <foreach collection="list" item="item" open="(" close=")" separator=",">
+      #{item}
+    </foreach>
+  </select>
+
+  <select id="getRoomInfoVo" resultMap="WithEmployeeInfo" parameterType="java.lang.Integer">
+    select r.id, r.room_id, r.employee_id , e.employee_real_name, e.employee_head_image, e.employee_sex, d.department_name
+    from room_info r left join employee e on r.employee_id = e.employee_id
+    left join department d on e.department_id = d.department_id
+    where id = #{Id,jdbcType=INTEGER}
+  </select>
+
+  <insert id="insertInfo" parameterType="com.dh.model.RoomInfo"
+      useGeneratedKeys="true" keyProperty="Id"
+  >
+    insert into room_info (room_id, employee_id)
+    values (#{RoomId,jdbcType=INTEGER}, #{EmployeeId,jdbcType=INTEGER})
+  </insert>
+
+  <delete id="deleteRoomInfo" parameterType="java.lang.Integer" >
+    delete from room_info
+    where employee_id = #{EmployeeId,jdbcType=INTEGER}
+  </delete>
+
+  <delete id="deleteRoomInfoById" parameterType="java.lang.Integer" >
+    delete from room_info
+    where id = #{Id,jdbcType=INTEGER}
+  </delete>
+
+  <delete id="deleteRoomInfoByRoomId" parameterType="java.lang.Integer" >
+    delete from room_info
+    where room_id = #{RoomId,jdbcType=INTEGER}
+  </delete>
+
+
+</mapper>

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dh.dao.ActivityRuleMapper" >
+  <resultMap id="BaseResultMap" type="com.dh.model.ActivityRule" >
+    <id column="activity_rule_id" property="activityRuleId" jdbcType="INTEGER" />
+    <result column="activity_id" property="activityId" jdbcType="INTEGER" />
+    <result column="activity_rule_content" property="activityRuleContent" jdbcType="VARCHAR" />
+    <result column="activity_rule_type" property="activityRuleType" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    activity_rule_id, activity_id, activity_rule_content, activity_rule_type
+  </sql>
+  
+  <!-- 获取活动规则列表 -->
+  <select id="getActivityRuleList" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+  	select 
+    <include refid="Base_Column_List" />
+    from activity_rule
+    where activity_id = #{activityId,jdbcType=INTEGER}
+  </select>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from activity_rule
+    where activity_rule_id = #{activityRuleId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from activity_rule
+    where activity_rule_id = #{activityRuleId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.dh.model.ActivityRule" >
+    insert into activity_rule (activity_rule_id, activity_id, activity_rule_content, 
+      activity_rule_type)
+    values (#{activityRuleId,jdbcType=INTEGER}, #{activityId,jdbcType=INTEGER}, #{activityRuleContent,jdbcType=VARCHAR}, 
+      #{activityRuleType,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.dh.model.ActivityRule" >
+    insert into activity_rule
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="activityRuleId != null" >
+        activity_rule_id,
+      </if>
+      <if test="activityId != null" >
+        activity_id,
+      </if>
+      <if test="activityRuleContent != null" >
+        activity_rule_content,
+      </if>
+      <if test="activityRuleType != null" >
+        activity_rule_type,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="activityRuleId != null" >
+        #{activityRuleId,jdbcType=INTEGER},
+      </if>
+      <if test="activityId != null" >
+        #{activityId,jdbcType=INTEGER},
+      </if>
+      <if test="activityRuleContent != null" >
+        #{activityRuleContent,jdbcType=VARCHAR},
+      </if>
+      <if test="activityRuleType != null" >
+        #{activityRuleType,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.dh.model.ActivityRule" >
+    update activity_rule
+    <set >
+      <if test="activityId != null" >
+        activity_id = #{activityId,jdbcType=INTEGER},
+      </if>
+      <if test="activityRuleContent != null" >
+        activity_rule_content = #{activityRuleContent,jdbcType=VARCHAR},
+      </if>
+      <if test="activityRuleType != null" >
+        activity_rule_type = #{activityRuleType,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where activity_rule_id = #{activityRuleId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.dh.model.ActivityRule" >
+    update activity_rule
+    set activity_id = #{activityId,jdbcType=INTEGER},
+      activity_rule_content = #{activityRuleContent,jdbcType=VARCHAR},
+      activity_rule_type = #{activityRuleType,jdbcType=VARCHAR}
+    where activity_rule_id = #{activityRuleId,jdbcType=INTEGER}
+  </update>
+</mapper>

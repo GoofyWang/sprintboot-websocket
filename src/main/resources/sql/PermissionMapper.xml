@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dh.dao.PermissionMapper" >
+  <resultMap id="BaseResultMap" type="com.dh.model.Permission" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="employee_id" property="employeeId" jdbcType="INTEGER" />
+    <result column="permission" property="permission" jdbcType="VARCHAR" />
+    <result column="value" property="value" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <resultMap id="PermissionEmpListVO" type="com.dh.model.vo.PermissionEmpListVO" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="employee_id" property="employeeId" jdbcType="INTEGER" />
+    <result column="permission" property="permission" jdbcType="VARCHAR" />
+    <result column="employee_real_name" property="employeeRealName" jdbcType="VARCHAR" />
+    <result column="department_name" property="departmentName" jdbcType="VARCHAR" />
+    <result column="value" property="value" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    id, employee_id , permission, value
+  </sql>
+
+
+  <select id="selectAll" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from permission
+  </select>
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from sys_config
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectPermissionByPermission" resultMap="BaseResultMap" parameterType="com.dh.model.Permission" >
+    select
+    <include refid="Base_Column_List" />
+    from permission
+    where
+    permission = #{permission,jdbcType=VARCHAR}
+    and employee_id = #{employeeId,jdbcType=INTEGER}
+  </select>
+
+  <delete id="deleteByPrimaryKeySelective" parameterType="java.lang.Integer" >
+    delete from permission
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+
+  <insert id="insert" parameterType="com.dh.model.Permission" >
+    insert into permission
+    (employee_id, permission, value)
+    values
+    (#{employeeId,jdbcType=INTEGER}, #{permission,jdbcType=VARCHAR}, #{value,jdbcType=VARCHAR})
+  </insert>
+
+  <select id="selectPermissionListByPermission" resultMap="PermissionEmpListVO" >
+    select
+    p.id, p.employee_id, p.permission , p.value, e.employee_real_name , d.department_name
+    from permission p left join employee e on p.employee_id = e.employee_id left join department d on e.department_id on d.department_id
+    where permission = 'room_permission'
+  </select>
+
+  <select id="getRoomPermissionList" resultMap="PermissionEmpListVO" >
+    SELECT
+    p.id,
+    p.employee_id,
+    p.permission,
+    p.`value`,
+    e.employee_real_name,
+    d.department_name
+    FROM
+    permission p
+    INNER JOIN employee e ON p.employee_id = e.employee_id
+    LEFT JOIN department d ON e.department_id = d.department_id
+    WHERE
+    p.permission = 'room_permission'
+  </select>
+
+</mapper>

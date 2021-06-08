@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dh.dao.RoomMapper" >
+  <resultMap id="BaseResultMap" type="com.dh.model.Room" >
+    <id column="room_id" property="RoomId" jdbcType="INTEGER" />
+    <result column="owner_id" property="OwnerId" jdbcType="INTEGER" />
+    <result column="num" property="Num" jdbcType="INTEGER" />
+    <result column="status" property="Status" jdbcType="INTEGER" />
+    <result column="type" property="Type" jdbcType="INTEGER" />
+    <result column="department" property="Department" jdbcType="INTEGER" />
+    <result column="create_time" property="CreateTime" />
+  </resultMap>
+
+
+  <select id="getRoomStatus" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select room_id,owner_id,num,status,department,create_time,type
+    from room
+    where room_id = #{RoomId,jdbcType=INTEGER}
+  </select>
+
+
+  <select id="getRoom" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select room_id,owner_id,num,status,department,create_time,type
+    from room
+    where room_id = #{RoomId,jdbcType=INTEGER} and status != 0
+  </select>
+
+  <select id="getRoomByOwnerId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select room_id,owner_id,num,status,department,create_time,type
+    from room
+    where owner_id = #{OwnerId,jdbcType=INTEGER} and status != 0 limit 1
+  </select>
+
+  <select id="getRoomByDepartment" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select room_id,owner_id,num,status,department,create_time,type
+    from room
+    where department = #{Department,jdbcType=INTEGER} and type = 1 and status != 0 limit 1
+  </select>
+
+  <insert id="createRoom" parameterType="com.dh.model.Room"
+      useGeneratedKeys="true" keyProperty="RoomId"
+  >
+    insert into room (owner_id, num, department, type)
+    values (#{OwnerId,jdbcType=INTEGER}, #{Num,jdbcType=INTEGER}, #{Department,jdbcType=INTEGER}, #{Type,jdbcType=INTEGER})
+  </insert>
+
+  <delete id="deleteRoomById" parameterType="java.lang.Integer" >
+    delete from room
+    where room_id = #{RoomId,jdbcType=INTEGER}
+  </delete>
+
+  <update id="leaveRoom" parameterType="java.lang.Integer" >
+    update room set status = 0
+    where owner_id = #{OwnerId,jdbcType=INTEGER}
+  </update>
+
+  <update id="increaseRoomNum"  parameterType="java.lang.Integer">
+    update room set num = num + 1
+    where room_id = #{RoomId,jdbcType=INTEGER}
+  </update>
+
+  <update id="decreaseRoomNum"  parameterType="java.lang.Integer">
+    update room set num = num - 1
+    where room_id = #{RoomId,jdbcType=INTEGER}
+  </update>
+
+
+  <update id="startFight" parameterType="java.util.List" >
+    update room set status = 3
+    where room_id in
+    <foreach collection="list" item="item" open="(" close=")" separator=",">
+      #{item}
+    </foreach>
+  </update>
+
+  <update id="match" parameterType="java.lang.Integer" >
+    update room set status = 2
+    where room_id = #{RoomId,jdbcType=INTEGER}
+  </update>
+
+  <update id="cancelMatch" parameterType="java.lang.Integer" >
+    update room set status = 1
+    where room_id = #{RoomId,jdbcType=INTEGER}
+  </update>
+
+  <select id="getPracticeRoom" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select room_id,owner_id,num,status,department,create_time,type
+    from room
+    where type = 0 and status = 2
+    order by room_id
+    limit #{Limit,jdbcType=INTEGER}
+  </select>
+
+  <select id="getFightRoom" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select room_id,owner_id,num,status,department,create_time,type
+    from room
+    where type = 1 and status = 2
+    order by room_id
+    limit #{Limit,jdbcType=INTEGER}
+  </select>
+
+</mapper>

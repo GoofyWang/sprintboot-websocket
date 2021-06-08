@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dh.dao.EmployeeMapper" >
+  <resultMap id="BaseResultMap" type="com.dh.model.Employee" >
+    <id column="employee_id" property="employeeId" jdbcType="INTEGER" />
+    <result column="employee_nickname" property="employeeNickname" jdbcType="VARCHAR" />
+    <result column="employee_head_image" property="employeeHeadImage" jdbcType="VARCHAR" />
+    <result column="employee_sex" property="employeeSex" jdbcType="CHAR" />
+    <result column="employee_mobile" property="employeeMobile" jdbcType="VARCHAR" />
+    <result column="employee_openid" property="employeeOpenid" jdbcType="VARCHAR" />
+    <result column="employee_sessionkey" property="employeeSessionkey" jdbcType="VARCHAR" />
+    <result column="employee_unionid" property="employeeUnionid" jdbcType="VARCHAR" />
+    <result column="employee_real_name" property="employeeRealName" jdbcType="VARCHAR" />
+    <result column="employee_password" property="employeePassword" jdbcType="VARCHAR" />
+    <result column="employee_quarantine_status" property="employeeQuarantineStatus" jdbcType="CHAR" />
+    <result column="employee_age" property="employeeAge" jdbcType="SMALLINT" />
+    <result column="department_id" property="departmentId" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="CHAR" />
+    <result column="update_time" property="updateTime" jdbcType="CHAR" />
+    <result column="status" property="status" jdbcType="CHAR" />
+  </resultMap>
+  
+  <resultMap id="EmployeeUserVO" type="com.dh.model.vo.EmployeeUserVO" >
+    <id column="employee_id" property="employeeId" jdbcType="INTEGER" />
+    <result column="employee_nickname" property="employeeNickname" jdbcType="VARCHAR" />
+    <result column="employee_head_image" property="employeeHeadImage" jdbcType="VARCHAR" />
+    <result column="employee_sex" property="employeeSex" jdbcType="CHAR" />
+    <result column="employee_mobile" property="employeeMobile" jdbcType="VARCHAR" />
+    <result column="employee_real_name" property="employeeRealName" jdbcType="VARCHAR" />
+    <result column="employee_age" property="employeeAge" jdbcType="SMALLINT" />
+    <result column="employee_quarantine_status" property="employeeQuarantineStatus" jdbcType="CHAR" />
+    <result column="department_id" property="departmentId" jdbcType="INTEGER" />
+    <result column="department_name" property="departmentName" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <resultMap id="EmployeeRankingVO" type="com.dh.model.vo.EmployeeRankingVO" >
+    <id column="employee_id" property="employeeId" jdbcType="INTEGER" />
+    <result column="employee_nickname" property="employeeNickname" jdbcType="VARCHAR" />
+    <result column="employee_head_image" property="employeeHeadImage" jdbcType="VARCHAR" />
+    <result column="employee_sex" property="employeeSex" jdbcType="CHAR" />
+    <result column="employee_real_name" property="employeeRealName" jdbcType="VARCHAR" />
+    <result column="department_parent_id" property="departmentParentId" jdbcType="INTEGER" />
+    <result column="employee_quarantine_status" property="employeeQuarantineStatus" jdbcType="CHAR" />
+    <result column="department_name" property="departmentName" jdbcType="VARCHAR" />
+  </resultMap>
+  
+   <resultMap id="EmployeeListVO" type="com.dh.model.vo.EmployeeListVO" >
+    <id column="employee_id" property="employeeId" jdbcType="INTEGER" />
+    <result column="employee_nickname" property="employeeNickname" jdbcType="VARCHAR" />
+    <result column="employee_sex" property="employeeSex" jdbcType="CHAR" />
+    <result column="employee_real_name" property="employeeRealName" jdbcType="VARCHAR" />
+    <result column="department_name" property="departmentName" jdbcType="VARCHAR" />
+    <result column="employee_quarantine_status" property="employeeQuarantineStatus" jdbcType="CHAR" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    employee_id, employee_nickname, employee_head_image, employee_sex, employee_mobile, 
+    employee_openid, employee_sessionkey, employee_unionid, employee_real_name,  
+    employee_password, employee_age, department_id, create_time, update_time, status,
+    employee_quarantine_status
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from employee
+    where employee_id = #{employeeId,jdbcType=INTEGER}
+  </select>
+  
+  <!-- 根据条件获取员工列表 -->
+  <select id="getDepartmentEmployeeList" resultMap="EmployeeListVO" parameterType="com.dh.model.dto.EmployeeListDTO">
+  	select e.employee_id, e.employee_nickname, e.employee_head_image, e.employee_sex, e.employee_mobile, 
+    	   e.employee_real_name, e.employee_age, e.department_id, d.department_name, 
+    	   e.employee_quarantine_status
+  	from employee e left join department d on e.department_id = d.department_id
+  	<where>
+  			e.`status` = 'Y' and d.status = 'Y'
+  		<if test="departmentId != null">
+  			and (e.department_id = #{departmentId} or d.department_parent_id = #{departmentId})
+  		</if>
+  		<if test="employeeName != null and employeeName != ''">
+  			and (e.employee_nickname like concat('%', #{employeeName}, '%') or 
+  				 e.employee_real_name like concat('%', #{employeeName}, '%'))
+  		</if>
+  	</where>
+  		order by e.create_time
+  </select>
+  
+  <!-- 获取员工信息 -->
+  <select id="getEmployeeInfoById" resultMap="EmployeeUserVO" parameterType="java.lang.Integer">
+  	select e.employee_id, e.employee_nickname, e.employee_head_image, e.employee_sex, e.employee_mobile, 
+    	   e.employee_real_name, e.employee_age, e.department_id, d.department_name,
+    	   e.employee_quarantine_status
+  	from employee e left join department d on e.department_id = d.department_id
+	where e.employee_id = #{employeeId} and e.`status` = 'Y' and d.status = 'Y'
+  </select>
+  
+  <!-- 根据员工标识ids获取员工信息 -->
+  <select id="getEmployeeRankingListByIds" resultMap="EmployeeRankingVO" parameterType="java.util.List">
+  	select e.employee_id, e.employee_nickname, e.employee_head_image, e.employee_sex, e.employee_mobile, 
+    	   e.employee_real_name, e.employee_age, d.department_parent_id, d.department_name,
+    	   e.employee_quarantine_status
+  	from employee e left join department d on e.department_id = d.department_id
+	where e.employee_id in
+	<foreach collection="list" item="item" open="(" close=")" separator=",">
+		#{item}
+	</foreach>
+	and e.`status` = 'Y' and d.status = 'Y'
+  </select>
+  
+  <!-- 根据员工标识获取员工信息 -->
+  <select id="getEmployeeRankingInfoById" resultMap="EmployeeRankingVO" parameterType="java.util.List">
+  	select e.employee_id, e.employee_nickname, e.employee_head_image, e.employee_sex, e.employee_mobile, 
+    	   e.employee_real_name, e.employee_age, d.department_parent_id, d.department_name,
+    	   e.employee_quarantine_status
+  	from employee e left join department d on e.department_id = d.department_id
+	where e.employee_id = #{employeeId} and e.`status` = 'Y' and d.status = 'Y'
+  </select>
+  
+  <!-- 根据openid获取员工信息 -->
+  <select id="getEmployeeInfoByOpenid" resultMap="BaseResultMap" parameterType="java.lang.String">
+  	select 
+    <include refid="Base_Column_List" />
+    from employee where employee_openid = #{openid} and status = 'Y'
+  </select>
+  
+  <!-- 根据token获取员工信息 -->
+  <select id="getEmployeeInfoByToken" resultMap="BaseResultMap" parameterType="java.lang.String">
+  	select e.employee_id, e.employee_nickname, e.employee_head_image, e.employee_sex,  
+    	   e.employee_openid, e.employee_sessionkey, e.employee_unionid, e.employee_real_name,  
+    	   e.employee_age, e.department_id, e.employee_mobile
+  	from employee e inner join employee_login el on e.employee_id = el.employee_id
+	where el.employee_login_token = #{token} and el.employee_login_status = '1' 
+	and e.`status` = 'Y'
+  </select>
+  
+  <!-- 添加用户信息 -->
+  <insert id="insertSelective" parameterType="com.dh.model.Employee" useGeneratedKeys="true" keyProperty="employeeId">
+    insert into employee
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="employeeId != null" >
+        employee_id,
+      </if>
+      <if test="employeeNickname != null and employeeNickname != ''" >
+        employee_nickname,
+      </if>
+      <if test="employeeHeadImage != null and employeeHeadImage != ''" >
+        employee_head_image,
+      </if>
+      <if test="employeeSex != null and employeeSex != ''" >
+        employee_sex,
+      </if>
+      <if test="employeeMobile != null and employeeMobile != ''" >
+        employee_mobile,
+      </if>
+      <if test="employeeOpenid != null and employeeOpenid != ''" >
+        employee_openid,
+      </if>
+      <if test="employeeSessionkey != null and employeeSessionkey != ''" >
+        employee_sessionkey,
+      </if>
+      <if test="employeeUnionid != null and employeeUnionid != ''" >
+        employee_unionid,
+      </if>
+      <if test="employeeRealName != null and employeeRealName != ''" >
+        employee_real_name,
+      </if>
+      <if test="employeePassword != null and employeePassword != ''" >
+        employee_password,
+      </if>
+      <if test="employeeAge != null" >
+        employee_age,
+      </if>
+      <if test="departmentId != null" >
+        department_id,
+      </if>
+      <if test="createTime != null and createTime != ''" >
+        create_time,
+      </if>
+      <if test="updateTime != null and updateTime != ''" >
+        update_time,
+      </if>
+      <if test="status != null and status != ''" >
+        status,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="employeeId != null" >
+        #{employeeId,jdbcType=INTEGER},
+      </if>
+      <if test="employeeNickname != null and employeeNickname != ''" >
+        #{employeeNickname,jdbcType=VARCHAR},
+      </if>
+      <if test="employeeHeadImage != null and employeeHeadImage != ''" >
+        #{employeeHeadImage,jdbcType=VARCHAR},
+      </if>
+      <if test="employeeSex != null and employeeSex != ''" >
+        #{employeeSex,jdbcType=CHAR},
+      </if>
+      <if test="employeeMobile != null and employeeMobile != ''" >
+        #{employeeMobile,jdbcType=VARCHAR},
+      </if>
+      <if test="employeeOpenid != null and employeeOpenid != ''" >
+        #{employeeOpenid,jdbcType=VARCHAR},
+      </if>
+      <if test="employeeSessionkey != null and employeeSessionkey != ''" >
+        #{employeeSessionkey,jdbcType=VARCHAR},
+      </if>
+      <if test="employeeUnionid != null and employeeUnionid != ''" >
+        #{employeeUnionid,jdbcType=VARCHAR},
+      </if>
+      <if test="employeeRealName != null and employeeRealName != ''" >
+        #{employeeRealName,jdbcType=VARCHAR},
+      </if>
+      <if test="employeePassword != null and employeePassword != ''" >
+        #{employeePassword,jdbcType=VARCHAR},
+      </if>
+      <if test="employeeAge != null" >
+        #{employeeAge,jdbcType=SMALLINT},
+      </if>
+      <if test="departmentId != null" >
+        #{departmentId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null and createTime != ''" >
+        #{createTime,jdbcType=CHAR},
+      </if>
+      <if test="updateTime != null and updateTime != ''" >
+        #{updateTime,jdbcType=CHAR},
+      </if>
+      <if test="status != null and status != ''" >
+        #{status,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  <!-- 修改员工隔离状态 -->
+  <update id="quarantineStatusEdit" parameterType="com.dh.model.Employee">
+  	update employee set employee_quarantine_status = #{employeeQuarantineStatus}
+  	where employee_id = #{employeeId,jdbcType=INTEGER}
+  </update>
+  
+  <!-- 修改员工信息 -->
+  <update id="updateByPrimaryKeySelective" parameterType="com.dh.model.Employee" >
+    update employee
+    <set >
+      <if test="employeeNickname != null and employeeNickname != ''" >
+        employee_nickname = #{employeeNickname,jdbcType=VARCHAR},
+      </if>
+      <if test="employeeHeadImage != null and employeeHeadImage != ''" >
+        employee_head_image = #{employeeHeadImage,jdbcType=VARCHAR},
+      </if>
+      <if test="employeeSex != null and employeeSex != ''" >
+        employee_sex = #{employeeSex,jdbcType=CHAR},
+      </if>
+      <if test="employeeMobile != null and employeeMobile != ''" >
+        employee_mobile = #{employeeMobile,jdbcType=VARCHAR},
+      </if>
+      <if test="employeeOpenid != null and employeeOpenid != ''" >
+        employee_openid = #{employeeOpenid,jdbcType=VARCHAR},
+      </if>
+      <if test="employeeSessionkey != null and employeeSessionkey != ''" >
+        employee_sessionkey = #{employeeSessionkey,jdbcType=VARCHAR},
+      </if>
+      <if test="employeeUnionid != null and employeeUnionid != ''" >
+        employee_unionid = #{employeeUnionid,jdbcType=VARCHAR},
+      </if>
+      <if test="employeeRealName != null and employeeRealName != ''" >
+        employee_real_name = #{employeeRealName,jdbcType=VARCHAR},
+      </if>
+      <if test="employeePassword != null and employeePassword != ''" >
+        employee_password = #{employeePassword,jdbcType=VARCHAR},
+      </if>
+      <if test="employeeAge != null" >
+        employee_age = #{employeeAge,jdbcType=SMALLINT},
+      </if>
+      <if test="departmentId != null" >
+        department_id = #{departmentId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null and createTime != ''" >
+        create_time = #{createTime,jdbcType=CHAR},
+      </if>
+      <if test="updateTime != null and updateTime != ''" >
+        update_time = #{updateTime,jdbcType=CHAR},
+      </if>
+      <if test="status != null and status != ''" >
+        status = #{status,jdbcType=CHAR},
+      </if>
+    </set>
+    where employee_id = #{employeeId,jdbcType=INTEGER}
+  </update>
+  
+</mapper>

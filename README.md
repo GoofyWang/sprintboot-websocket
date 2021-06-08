@@ -1,15 +1,15 @@
 在线测试地址:
 
-服务端：www.isuyu.cn:8086/admin
+服务端：www.idhplay.cn:8089/admin
 
-客户端: www.isuyu.cn:8086/index
+客户端: www.idhplay.cn:8089/index
 
 #### 服务端当前在线数和在线人不是异步的，接受客户端的信息是异步的，所有在所有用户连接完成后刷新一次服务端就好
 
 - 支持给一人推送信息，多人推送以及全部推送 个人推送和多人推送只要在多选框选择要推送的人，然后点击发送  全部推送 只需点击全部发送就好
 
 
-![演示gif](https://suyu-img.oss-cn-shenzhen.aliyuncs.com/demo.gif)
+![演示gif](https://dhplay-img.oss-cn-shenzhen.aliyuncs.com/demo.gif)
 
 ### Websocket
 
@@ -68,7 +68,7 @@ var ws = null;
 
 //和服务端进行连接的
 if ('WebSocket' in window){
-   ws = new WebSocket("ws://127.0.0.1:8086/socketServer/client2");
+   ws = new WebSocket("ws://47.92.77.182:8089/socketServer/client2");
    
 } else{
     console.log("该浏览器不支持websocket");    

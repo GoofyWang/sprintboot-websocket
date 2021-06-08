@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dh.dao.DepartmentRankingMapper" >
+  <resultMap id="BaseResultMap" type="com.dh.model.DepartmentRanking" >
+    <id column="dr_id" property="drId" jdbcType="INTEGER" />
+    <result column="department_id" property="departmentId" jdbcType="INTEGER" />
+    <result column="dr_total_score" property="drTotalScore" jdbcType="INTEGER" />
+    <result column="dr_total_time" property="drTotalTime" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="CHAR" />
+    <result column="update_time" property="updateTime" jdbcType="CHAR" />
+    <result column="status" property="status" jdbcType="CHAR" />
+  </resultMap>
+  
+  <resultMap id="DepartmentRankingVO" type="com.dh.model.vo.DepartmentRankingVO" >
+    <result column="department_id" property="departmentId" jdbcType="INTEGER" />
+    <result column="department_name" property="departmentName" jdbcType="VARCHAR" />
+    <result column="department_parent_id" property="departmentParentId" jdbcType="INTEGER" />
+    <result column="dr_total_score" property="departmentTotalScore" jdbcType="INTEGER" />
+    <result column="dr_total_time" property="departmentTotalUseTime" jdbcType="INTEGER" />
+    <result column="rank" property="departmentRankingNumber" jdbcType="INTEGER" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    dr_id, department_id, dr_total_score, dr_total_time, create_time, update_time, status
+  </sql>
+  
+   <!-- 获取部门当前排名信息 -->
+  <select id="getDepartmentCurrRankingByDepartmentId" resultMap="DepartmentRankingVO" parameterType="java.lang.Integer">
+  	select t.department_id, t.dr_total_score, t.dr_total_time, t.rank, t.department_name, t.department_parent_id from (
+		select dr.department_id, d.department_name, d.department_parent_id, 
+		dr.dr_total_score, dr.dr_total_time, (@rank := @rank+1) as rank
+		from department_ranking dr, department d, (select @rank := 0) s 
+		where dr.department_id = d.department_id and d.`status` = 'Y' and dr.`status` = 'Y'
+		order by dr_total_score desc, dr_total_time
+	) t where t.department_id = #{departmentId}	
+  </select>
+  
+  <!-- 获取部门排名列表-->
+  <select id="getDepartmentRankingList"  resultMap="DepartmentRankingVO" parameterType="java.lang.Integer">
+	select dr.department_id, d.department_name, d.department_parent_id, 
+		   dr.dr_total_score, dr.dr_total_time, (@rank := @rank+1) as rank
+	from department_ranking dr, department d, (select @rank := 0) s 
+	where dr.department_id = d.department_id and d.`status` = 'Y' and dr.`status` = 'Y'
+	order by dr_total_score desc, dr_total_time
+  </select>
+  
+  <!-- 根据部门标识获取部门排行榜信息 -->
+  <select id="getDepartmentRankingInfoByDepartmentId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from department_ranking
+    where department_id = #{departmentId,jdbcType=INTEGER} and status = 'Y'
+  </select>
+  
+  <!-- 添加部门排行信息 -->
+  <insert id="insert" parameterType="com.dh.model.DepartmentRanking" >
+    insert into department_ranking (department_id, dr_total_score, 
+      dr_total_time, create_time, update_time, status)
+    values (#{departmentId,jdbcType=INTEGER}, #{drTotalScore,jdbcType=INTEGER}, 
+      #{drTotalTime,jdbcType=INTEGER}, #{createTime,jdbcType=CHAR}, #{updateTime,jdbcType=CHAR}, 
+      #{status,jdbcType=CHAR})
+  </insert>
+  
+  <!-- 修改部门排行信息 -->
+  <update id="updateByPrimaryKey" parameterType="com.dh.model.DepartmentRanking" >
+    update department_ranking
+    set department_id = #{departmentId,jdbcType=INTEGER},
+      dr_total_score = #{drTotalScore,jdbcType=INTEGER},
+      dr_total_time = #{drTotalTime,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=CHAR},
+      update_time = #{updateTime,jdbcType=CHAR},
+      status = #{status,jdbcType=CHAR}
+    where dr_id = #{drId,jdbcType=INTEGER}
+  </update>
+</mapper>

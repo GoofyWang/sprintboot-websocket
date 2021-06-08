@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dh.dao.ActivityItemBankMapper" >
+  <resultMap id="BaseResultMap" type="com.dh.model.ActivityItemBank" >
+    <id column="aib_id" property="aibId" jdbcType="INTEGER" />
+    <result column="activity_id" property="activityId" jdbcType="INTEGER" />
+    <result column="item_bank_id" property="itemBankId" jdbcType="INTEGER" />
+    <result column="aib_score" property="aibScore" jdbcType="INTEGER" />
+    <result column="aib_sort" property="aibSort" jdbcType="INTEGER" />
+  </resultMap>
+  
+  <resultMap id="ActivityItemBankVO" type="com.dh.model.vo.ActivityItemBankVO" >
+    <result column="activity_id" property="activityId" jdbcType="INTEGER" />
+    <result column="item_bank_id" property="itemBankId" jdbcType="INTEGER" />
+    <result column="aib_score" property="aibScore" jdbcType="INTEGER" />
+    <result column="aib_sort" property="aibSort" jdbcType="INTEGER" />
+    <result column="item_bank_title" property="itemBankTitle" jdbcType="VARCHAR" />
+    <result column="item_bank_analysis" property="itemBankAnalysis" jdbcType="VARCHAR" />
+    <result column="item_bank_type" property="itemBankType" jdbcType="CHAR" />
+    <collection property="answerList" ofType="com.dh.model.Answer">
+    	<id column="answer_id" property="answerId" jdbcType="INTEGER" />
+	    <result column="item_bank_id" property="itemBankId" jdbcType="INTEGER" />
+	    <result column="answer_content" property="answerContent" jdbcType="VARCHAR" />
+	    <result column="answer_status" property="answerStatus" jdbcType="CHAR" />
+    </collection>
+  </resultMap>
+  
+  <resultMap id="ActivityIBVO" type="com.dh.model.vo.ActivityIBVO" >
+    <result column="activity_id" property="activityId" jdbcType="INTEGER" />
+    <result column="item_bank_id" property="itemBankId" jdbcType="INTEGER" />
+    <result column="aib_score" property="aibScore" jdbcType="INTEGER" />
+    <result column="item_bank_title" property="itemBankTitle" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    aib_id, activity_id, item_bank_id, aib_score, aib_sort
+  </sql>
+  
+  <!-- 根据活动标识获取活动试题列表 -->
+  <select id="getAibListByActivityId" resultMap="ActivityIBVO" parameterType="java.lang.Integer">
+  	select aib.activity_id, aib.item_bank_id, aib.aib_score, ib.item_bank_title 
+  	from activity_item_bank aib inner join item_bank ib
+	on aib.item_bank_id = ib.item_bank_id 
+	where aib.activity_id = #{activityId} and ib.status = 'Y'
+  </select>
+  
+  <!-- 获取活动试题列表 -->
+  <select id="getActivityItemBankAdminList" resultMap="ActivityIBVO" parameterType="com.dh.model.dto.ActivityItemBankParamDTO">
+  	select aib.aib_id, aib.activity_id, aib.item_bank_id, aib.aib_score, ib.item_bank_title 
+  	from activity_item_bank aib inner join item_bank ib
+	on aib.item_bank_id = ib.item_bank_id 
+	<where>
+			ib.status = 'Y'
+		<if test="activityId != null and activityId != ''">
+			and aib.activity_id = #{activityId}
+		</if>
+		<if test="itemBankTitle != null and itemBankTitle != ''">
+			and ib.item_bank_title like concat('%',#{itemBankTitle},'%')
+		</if>
+	</where>
+	order by aib.aib_sort
+  </select>
+  
+  <!-- 获取最大排序值 -->
+  <select id="getMaxSort" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+  	select max(aib_sort) from activity_item_bank where activity_id = #{activityId}
+  </select>
+  
+  <!-- 根据活动标识获取试题总分 -->
+  <select id="getTotalScoreByActivityId" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+  	select sum(aib_score) from activity_item_bank where activity_id = #{activityId}
+  </select>
+  
+  <!-- 根据活动获取试题信息列表 -->
+  <select id="getActivityItemBankList" resultMap="ActivityItemBankVO" parameterType="java.lang.Integer">
+  	select distinct ib.item_bank_id, ib.item_bank_title, ib.item_bank_analysis, ib.item_bank_type,
+    	   a.answer_id, a.item_bank_id, a.answer_content, a.answer_status,
+    	   aib.activity_id, aib.aib_score, aib.aib_sort 
+    from item_bank ib inner join answer a on ib.item_bank_id = a.item_bank_id
+    inner join activity_item_bank aib on ib.item_bank_id = aib.item_bank_id
+  	where activity_id = #{activityId} order by aib_sort
+  </select>
+
+  <!-- 对战获取单条题目 -->
+  <select id="getRandomItemBank" resultMap="ActivityItemBankVO">
+      select distinct ib.item_bank_id, ib.item_bank_title, ib.item_bank_analysis, ib.item_bank_type,
+      a.answer_id, a.item_bank_id, a.answer_content, a.answer_status
+      from item_bank ib inner join answer a on ib.item_bank_id = a.item_bank_id
+      where
+      ib.item_bank_id in
+      <foreach collection="list" item="item" open="(" close=")" separator=",">
+          #{item}
+      </foreach>
+  </select>
+
+
+    <!-- 对战获取单条题目 -->
+    <select id="getRandomItemBankId" resultType="java.lang.Integer" >
+        SELECT t1.item_bank_id
+        FROM `item_bank` AS t1 JOIN (SELECT ROUND(RAND() * ((SELECT MAX(item_bank_id) FROM `item_bank`)-(SELECT MIN(item_bank_id) FROM `item_bank`))+(SELECT MIN(item_bank_id) FROM `item_bank`)) AS id) AS t2
+        WHERE t1.item_bank_id >= t2.id
+        ORDER BY t1.item_bank_id LIMIT 1
+    </select>
+
+
+    <!-- 对战获取单条题目 -->
+  <select id="getRandomItemBankIdNotInIds" resultType="java.lang.Integer" parameterType="java.util.List" >
+      SELECT t1.item_bank_id
+      FROM `item_bank` AS t1 JOIN (SELECT ROUND(RAND() * ((SELECT MAX(item_bank_id) FROM `item_bank`)-(SELECT MIN(item_bank_id) FROM `item_bank`))+(SELECT MIN(item_bank_id) FROM `item_bank`)) AS id) AS t2
+      WHERE t1.item_bank_id >= t2.id and t1.item_bank_id not in
+      <foreach collection="list" item="item" open="(" close=")" separator=",">
+      #{item}
+      </foreach>
+      ORDER BY t1.item_bank_id LIMIT 1
+  </select>
+
+
+  <!-- 根据活动获取试题信息列表 -->
+  <select id="getActivityItemBankRealAnswerList" resultMap="ActivityItemBankVO" parameterType="java.lang.Integer">
+  	select ib.item_bank_id, ib.item_bank_title, ib.item_bank_analysis, ib.item_bank_type,
+    	   a.answer_id, a.item_bank_id, a.answer_content, a.answer_status,
+    	   aib.activity_id, aib.aib_score, aib.aib_sort 
+    from item_bank ib inner join answer a on ib.item_bank_id = a.item_bank_id
+    inner join activity_item_bank aib on ib.item_bank_id = aib.item_bank_id
+  	where activity_id = #{activityId} and answer_status = 'Y' order by aib_sort
+  </select>
+  
+  <!-- 根据活动标识获取活动试题信息 -->
+  <select id="getActivityItemBankListByActivityId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from activity_item_bank
+    where activity_id = #{activityId}
+  </select>
+  
+  <!-- 删除活动试题 -->
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from activity_item_bank
+    where aib_id = #{aibId,jdbcType=INTEGER}
+  </delete>
+  
+  <!-- 根据活动标识删除活动试题 -->
+  <delete id="deleteActivityItemBankByActivityId" parameterType="java.lang.Integer" >
+    delete from activity_item_bank
+    where activity_id = #{activityId,jdbcType=INTEGER}
+  </delete>
+  
+  <!-- 批量删除活动试题 -->
+  <delete id="batchDeleteActivityItemBankInfo" parameterType="java.util.List">
+  	delete from activity_item_bank where aib_id in
+    <foreach collection="list" item="item" open="(" close=")" separator=",">
+    	#{item}
+    </foreach>
+  </delete>
+  
+  <!-- 批量添加活动试题 -->
+  <insert id="insert" parameterType="java.util.List" >
+    insert into activity_item_bank (activity_id, item_bank_id,aib_score, aib_sort) values
+    <foreach collection="list" item="item" separator=",">
+    	(#{item.activityId,jdbcType=INTEGER}, #{item.itemBankId,jdbcType=INTEGER}, 
+      	 #{item.aibScore,jdbcType=INTEGER}, #{item.aibSort,jdbcType=INTEGER})
+    </foreach>
+  </insert>
+  
+  <!-- 批量添加活动试题 -->
+  <insert id="addActivityItemBankInfo" parameterType="java.util.List">
+  	insert into activity_item_bank (activity_id, item_bank_id,aib_score) values
+    <foreach collection="list" item="item" separator=",">
+    	(#{item.activityId,jdbcType=INTEGER}, #{item.itemBankId,jdbcType=INTEGER}, 
+      	 #{item.aibScore,jdbcType=INTEGER})
+    </foreach>
+  </insert>
+  
+  <!-- 添加活动试题 -->
+  <insert id="insertSelective" parameterType="com.dh.model.ActivityItemBank" >
+    insert into activity_item_bank
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="aibId != null" >
+        aib_id,
+      </if>
+      <if test="activityId != null" >
+        activity_id,
+      </if>
+      <if test="itemBankId != null" >
+        item_bank_id,
+      </if>
+      <if test="aibScore != null" >
+        aib_score,
+      </if>
+      <if test="aibSort != null" >
+        aib_sort,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="aibId != null" >
+        #{aibId,jdbcType=INTEGER},
+      </if>
+      <if test="activityId != null" >
+        #{activityId,jdbcType=INTEGER},
+      </if>
+      <if test="itemBankId != null" >
+        #{itemBankId,jdbcType=INTEGER},
+      </if>
+      <if test="aibScore != null" >
+        #{aibScore,jdbcType=INTEGER},
+      </if>
+      <if test="aibSort != null" >
+        #{aibSort,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  
+  <!-- 修改活动试题 -->
+  <update id="updateByPrimaryKeySelective" parameterType="com.dh.model.ActivityItemBank" >
+    update activity_item_bank
+    <set >
+      <if test="activityId != null" >
+        activity_id = #{activityId,jdbcType=INTEGER},
+      </if>
+      <if test="itemBankId != null" >
+        item_bank_id = #{itemBankId,jdbcType=INTEGER},
+      </if>
+      <if test="aibScore != null" >
+        aib_score = #{aibScore,jdbcType=INTEGER},
+      </if>
+      <if test="aibSort != null" >
+        aib_sort = #{aibSort,jdbcType=INTEGER},
+      </if>
+    </set>
+    where aib_id = #{aibId,jdbcType=INTEGER}
+  </update>
+  
+</mapper>

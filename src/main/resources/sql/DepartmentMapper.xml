@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dh.dao.DepartmentMapper" >
+  <resultMap id="BaseResultMap" type="com.dh.model.Department" >
+    <id column="department_id" property="departmentId" jdbcType="INTEGER" />
+    <result column="department_name" property="departmentName" jdbcType="VARCHAR" />
+    <result column="department_parent_id" property="departmentParentId" jdbcType="INTEGER" />
+    <result column="department_level" property="departmentLevel" jdbcType="SMALLINT" />
+    <result column="department_sort" property="departmentSort" jdbcType="INTEGER" />
+    <result column="create_id" property="createId" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="CHAR" />
+    <result column="update_id" property="updateId" jdbcType="INTEGER" />
+    <result column="update_time" property="updateTime" jdbcType="CHAR" />
+    <result column="status" property="status" jdbcType="CHAR" />
+  </resultMap>
+  
+  <resultMap id="DepartmentListVO" type="com.dh.model.vo.DepartmentListVO" >
+    <id column="department_id" property="departmentId" jdbcType="INTEGER" />
+    <result column="department_name" property="departmentName" jdbcType="VARCHAR" />
+    <result column="department_parent_id" property="departmentParentId" jdbcType="INTEGER" />
+    <result column="department_level" property="departmentLevel" jdbcType="SMALLINT" />
+    <result column="department_sort" property="departmentSort" jdbcType="INTEGER" />
+  </resultMap>
+  
+  <resultMap id="DepartmentInfoVO" type="com.dh.model.vo.DepartmentInfoVO" >
+    <id column="department_id" property="departmentId" jdbcType="INTEGER" />
+    <result column="department_name" property="departmentName" jdbcType="VARCHAR" />
+    <result column="department_parent_id" property="departmentParentId" jdbcType="INTEGER" />
+    <result column="department_level" property="departmentLevel" jdbcType="SMALLINT" />
+    <result column="department_sort" property="departmentSort" jdbcType="INTEGER" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    department_id, department_name, department_parent_id, department_level, department_sort, 
+    create_id, create_time, update_id, update_time, status
+  </sql>
+  
+  <!-- 获取部门信息 -->
+  <select id="getDepartmentInfo" resultMap="DepartmentInfoVO" parameterType="java.lang.Integer" >
+    select department_id, department_name, department_parent_id, department_level, department_sort
+    from department where department_id = #{departmentId,jdbcType=INTEGER} and status = 'Y'
+  </select>
+  
+  <!-- 根据部门ids获取部门列表 -->
+  <select id="getDepartmentListByIds" resultMap="DepartmentInfoVO" parameterType="java.util.List" >
+    select department_id, department_name, department_parent_id, department_level, department_sort
+    from department where department_id in
+    <foreach collection="list" item="item" open="(" close=")" separator=",">
+		#{item}
+	</foreach>
+    and status = 'Y'
+  </select>
+  
+  <!-- 获取部门列表 -->
+  <select id="getDepartmentList" resultMap="DepartmentListVO" parameterType="com.dh.model.dto.DepartmentParamDTO" >
+  	select department_id, department_name, department_parent_id, department_level, department_sort
+    from department 
+    <where>
+    		status = 'Y'
+    	<if test="departmentName != null and departmentName != ''">
+    		and department_name like concat('%', #{departmentName},'%')
+    	</if>
+    	<if test="departmentParentId != null">
+    		and department_parent_id = #{departmentParentId}
+    	</if>
+    	<if test="departmentLevel != null">
+    		and department_level = #{departmentLevel}
+    	</if>
+    </where>
+    	order by department_sort
+  </select>
+  
+  <!-- 添加部门信息 -->
+  <insert id="insertSelective" parameterType="com.dh.model.Department" >
+    insert into department
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="departmentId != null" >
+        department_id,
+      </if>
+      <if test="departmentName != null and departmentName != ''" >
+        department_name,
+      </if>
+      <if test="departmentParentId != null" >
+        department_parent_id,
+      </if>
+      <if test="departmentLevel != null" >
+        department_level,
+      </if>
+      <if test="departmentSort != null" >
+        department_sort,
+      </if>
+      <if test="createId != null" >
+        create_id,
+      </if>
+      <if test="createTime != null and createTime != ''" >
+        create_time,
+      </if>
+      <if test="updateId != null" >
+        update_id,
+      </if>
+      <if test="updateTime != null and updateTime != ''" >
+        update_time,
+      </if>
+      <if test="status != null and status != ''" >
+        status,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="departmentId != null" >
+        #{departmentId,jdbcType=INTEGER},
+      </if>
+      <if test="departmentName != null and departmentName != ''" >
+        #{departmentName,jdbcType=VARCHAR},
+      </if>
+      <if test="departmentParentId != null" >
+        #{departmentParentId,jdbcType=INTEGER},
+      </if>
+      <if test="departmentLevel != null" >
+        #{departmentLevel,jdbcType=SMALLINT},
+      </if>
+      <if test="departmentSort != null" >
+        #{departmentSort,jdbcType=INTEGER},
+      </if>
+      <if test="createId != null" >
+        #{createId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null and createTime != ''" >
+        #{createTime,jdbcType=CHAR},
+      </if>
+      <if test="updateId != null" >
+        #{updateId,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null and updateTime != ''" >
+        #{updateTime,jdbcType=CHAR},
+      </if>
+      <if test="status != null and status != ''" >
+        #{status,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  <!-- 修改部门信息 -->
+  <update id="updateByPrimaryKeySelective" parameterType="com.dh.model.Department" >
+    update department
+    <set >
+      <if test="departmentName != null and departmentName != ''" >
+        department_name = #{departmentName,jdbcType=VARCHAR},
+      </if>
+      <if test="departmentParentId != null" >
+        department_parent_id = #{departmentParentId,jdbcType=INTEGER},
+      </if>
+      <if test="departmentLevel != null" >
+        department_level = #{departmentLevel,jdbcType=SMALLINT},
+      </if>
+      <if test="departmentSort != null" >
+        department_sort = #{departmentSort,jdbcType=INTEGER},
+      </if>
+      <if test="createId != null" >
+        create_id = #{createId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null and createTime != ''" >
+        create_time = #{createTime,jdbcType=CHAR},
+      </if>
+      <if test="updateId != null" >
+        update_id = #{updateId,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null and updateTime != ''" >
+        update_time = #{updateTime,jdbcType=CHAR},
+      </if>
+      <if test="status != null and status != ''" >
+        status = #{status,jdbcType=CHAR},
+      </if>
+    </set>
+    where department_id = #{departmentId,jdbcType=INTEGER}
+  </update>
+  
+</mapper>

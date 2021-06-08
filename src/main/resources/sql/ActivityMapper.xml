@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dh.dao.ActivityMapper" >
+  <resultMap id="BaseResultMap" type="com.dh.model.Activity" >
+    <id column="activity_id" property="activityId" jdbcType="INTEGER" />
+    <result column="activity_name" property="activityName" jdbcType="VARCHAR" />
+    <result column="activity_start_time" property="activityStartTime" jdbcType="CHAR" />
+    <result column="activity_end_time" property="activityEndTime" jdbcType="CHAR" />
+    <result column="activity_remark" property="activityRemark" jdbcType="VARCHAR" />
+    <result column="create_id" property="createId" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="CHAR" />
+    <result column="update_id" property="updateId" jdbcType="INTEGER" />
+    <result column="update_time" property="updateTime" jdbcType="CHAR" />
+    <result column="status" property="status" jdbcType="CHAR" />
+  </resultMap>
+  
+  <resultMap id="ActivityVO" type="com.dh.model.vo.ActivityVO" >
+    <id column="activity_id" property="activityId" jdbcType="INTEGER" />
+    <result column="activity_name" property="activityName" jdbcType="VARCHAR" />
+    <result column="activity_start_time" property="activityStartTime" jdbcType="CHAR" />
+    <result column="activity_end_time" property="activityEndTime" jdbcType="CHAR" />
+    <result column="activity_remark" property="activityRemark" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    activity_id, activity_name, activity_start_time, activity_end_time, activity_remark, 
+    create_id, create_time, update_id, update_time, status
+  </sql>
+  
+  <!-- 用户端获取活动列表 -->
+  <select id="getActivityUserList" resultMap="ActivityVO" parameterType="java.lang.String">
+  	select activity_id, activity_name, activity_start_time, activity_end_time, activity_remark
+  	from activity where activity_start_time &lt;= #{nowTime} and activity_end_time &gt;= #{nowTime}
+  	and status = 'Y' order by activity_start_time
+  </select>
+  
+  <!-- 获取活动详情 -->
+  <select id="getActivityInfo" resultMap="ActivityVO" parameterType="java.lang.Integer" >
+    select activity_id, activity_name, activity_start_time, activity_end_time, activity_remark
+    from activity where activity_id = #{activityId,jdbcType=INTEGER} and status = 'Y'
+  </select>
+  
+  <!-- 获取活动列表 -->
+  <select id="getActivityList" resultMap="ActivityVO" parameterType="com.dh.model.dto.ActivityParamDTO">
+  	select activity_id, activity_name, activity_start_time, activity_end_time, activity_remark
+    from activity
+    <where>
+    		status = 'Y'
+    	<if test="activityName != null and activityName != ''">
+    		and activity_name like concat('%', #{activityName},'%')
+    	</if>
+    	<if test="activityStartTime != null and activityStartTime != ''">
+    		and activity_end_time &gt;= #{activityStartTime}
+    	</if>
+    	<if test="activityEndTime != null and activityEndTime != ''">
+    		and activity_start_time &lt;= #{activityEndTime}
+    	</if>
+    </where>
+    order by update_time desc
+  </select>
+  
+  <!-- 获取活动详情 -->
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from activity
+    where activity_id = #{activityId,jdbcType=INTEGER} and status = 'Y'
+  </select>
+  
+  <!-- 删除活动信息 -->
+  <update id="deleteActivityInfo" parameterType="com.dh.model.dto.ActivityDelDTO" >
+    update activity set update_id = #{updateId}, update_time = #{updateTime},
+    	   status = #{status}
+    where activity_id = #{activityId,jdbcType=INTEGER}
+  </update>
+  
+  <!-- 添加活动信息 -->
+  <insert id="insertSelective" parameterType="com.dh.model.Activity" >
+    insert into activity
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="activityId != null" >
+        activity_id,
+      </if>
+      <if test="activityName != null and activityName != ''" >
+        activity_name,
+      </if>
+      <if test="activityStartTime != null and activityStartTime != ''" >
+        activity_start_time,
+      </if>
+      <if test="activityEndTime != null and activityEndTime != ''" >
+        activity_end_time,
+      </if>
+      <if test="activityRemark != null and activityRemark != ''" >
+        activity_remark,
+      </if>
+      <if test="createId != null" >
+        create_id,
+      </if>
+      <if test="createTime != null and createTime != ''" >
+        create_time,
+      </if>
+      <if test="updateId != null" >
+        update_id,
+      </if>
+      <if test="updateTime != null and updateTime != ''" >
+        update_time,
+      </if>
+      <if test="status != null and status != ''" >
+        status,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="activityId != null" >
+        #{activityId,jdbcType=INTEGER},
+      </if>
+      <if test="activityName != null and activityName != ''" >
+        #{activityName,jdbcType=VARCHAR},
+      </if>
+      <if test="activityStartTime != null and activityStartTime != ''" >
+        #{activityStartTime,jdbcType=CHAR},
+      </if>
+      <if test="activityEndTime != null and activityEndTime != ''" >
+        #{activityEndTime,jdbcType=CHAR},
+      </if>
+      <if test="activityRemark != null and activityRemark != ''" >
+        #{activityRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="createId != null" >
+        #{createId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null and createTime != ''" >
+        #{createTime,jdbcType=CHAR},
+      </if>
+      <if test="updateId != null" >
+        #{updateId,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null and updateTime != ''" >
+        #{updateTime,jdbcType=CHAR},
+      </if>
+      <if test="status != null and status != ''" >
+        #{status,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  <!-- 修改活动信息 -->
+  <update id="updateByPrimaryKeySelective" parameterType="com.dh.model.Activity" >
+    update activity
+    <set >
+      <if test="activityName != null and activityName != ''" >
+        activity_name = #{activityName,jdbcType=VARCHAR},
+      </if>
+      <if test="activityStartTime != null and activityStartTime != ''" >
+        activity_start_time = #{activityStartTime,jdbcType=CHAR},
+      </if>
+      <if test="activityEndTime != null and activityEndTime != ''" >
+        activity_end_time = #{activityEndTime,jdbcType=CHAR},
+      </if>
+      <if test="activityRemark != null and activityRemark != ''" >
+        activity_remark = #{activityRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="createId != null" >
+        create_id = #{createId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null and createTime != ''" >
+        create_time = #{createTime,jdbcType=CHAR},
+      </if>
+      <if test="updateId != null" >
+        update_id = #{updateId,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null and updateTime != ''" >
+        update_time = #{updateTime,jdbcType=CHAR},
+      </if>
+      <if test="status != null and status != ''" >
+        status = #{status,jdbcType=CHAR},
+      </if>
+    </set>
+    where activity_id = #{activityId,jdbcType=INTEGER}
+  </update>
+  
+</mapper>

@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dh.dao.AdminInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.dh.model.AdminInfo" >
+    <id column="admin_id" property="adminId" jdbcType="INTEGER" />
+    <result column="admin_login_name" property="adminLoginName" jdbcType="VARCHAR" />
+    <result column="admin_login_pwd" property="adminLoginPwd" jdbcType="VARCHAR" />
+    <result column="admin_name" property="adminName" jdbcType="VARCHAR" />
+    <result column="admin_sex" property="adminSex" jdbcType="CHAR" />
+    <result column="admin_head_image" property="adminHeadImage" jdbcType="VARCHAR" />
+    <result column="admin_mobile" property="adminMobile" jdbcType="VARCHAR" />
+    <result column="create_id" property="createId" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="CHAR" />
+    <result column="update_id" property="updateId" jdbcType="INTEGER" />
+    <result column="update_time" property="updateTime" jdbcType="CHAR" />
+    <result column="status" property="status" jdbcType="CHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    admin_id, admin_login_name, admin_login_pwd, admin_name, admin_sex, admin_head_image, 
+    admin_mobile, create_id, create_time, update_id, update_time, status
+  </sql>
+  
+  <!-- 根据用户名获取用户信息 -->
+  <select id="getAdminInfoByLoginName" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from admin_info
+    where admin_login_name = #{adminLoginName,jdbcType=INTEGER}
+  </select>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from admin_info
+    where admin_id = #{adminId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from admin_info
+    where admin_id = #{adminId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.dh.model.AdminInfo" >
+    insert into admin_info (admin_id, admin_login_name, admin_login_pwd, 
+      admin_name, admin_sex, admin_head_image, 
+      admin_mobile, create_id, create_time, 
+      update_id, update_time, status
+      )
+    values (#{adminId,jdbcType=INTEGER}, #{adminLoginName,jdbcType=VARCHAR}, #{adminLoginPwd,jdbcType=VARCHAR}, 
+      #{adminName,jdbcType=VARCHAR}, #{adminSex,jdbcType=CHAR}, #{adminHeadImage,jdbcType=VARCHAR}, 
+      #{adminMobile,jdbcType=VARCHAR}, #{createId,jdbcType=INTEGER}, #{createTime,jdbcType=CHAR}, 
+      #{updateId,jdbcType=INTEGER}, #{updateTime,jdbcType=CHAR}, #{status,jdbcType=CHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.dh.model.AdminInfo" >
+    insert into admin_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="adminId != null" >
+        admin_id,
+      </if>
+      <if test="adminLoginName != null" >
+        admin_login_name,
+      </if>
+      <if test="adminLoginPwd != null" >
+        admin_login_pwd,
+      </if>
+      <if test="adminName != null" >
+        admin_name,
+      </if>
+      <if test="adminSex != null" >
+        admin_sex,
+      </if>
+      <if test="adminHeadImage != null" >
+        admin_head_image,
+      </if>
+      <if test="adminMobile != null" >
+        admin_mobile,
+      </if>
+      <if test="createId != null" >
+        create_id,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateId != null" >
+        update_id,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="adminId != null" >
+        #{adminId,jdbcType=INTEGER},
+      </if>
+      <if test="adminLoginName != null" >
+        #{adminLoginName,jdbcType=VARCHAR},
+      </if>
+      <if test="adminLoginPwd != null" >
+        #{adminLoginPwd,jdbcType=VARCHAR},
+      </if>
+      <if test="adminName != null" >
+        #{adminName,jdbcType=VARCHAR},
+      </if>
+      <if test="adminSex != null" >
+        #{adminSex,jdbcType=CHAR},
+      </if>
+      <if test="adminHeadImage != null" >
+        #{adminHeadImage,jdbcType=VARCHAR},
+      </if>
+      <if test="adminMobile != null" >
+        #{adminMobile,jdbcType=VARCHAR},
+      </if>
+      <if test="createId != null" >
+        #{createId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=CHAR},
+      </if>
+      <if test="updateId != null" >
+        #{updateId,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=CHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.dh.model.AdminInfo" >
+    update admin_info
+    <set >
+      <if test="adminLoginName != null" >
+        admin_login_name = #{adminLoginName,jdbcType=VARCHAR},
+      </if>
+      <if test="adminLoginPwd != null" >
+        admin_login_pwd = #{adminLoginPwd,jdbcType=VARCHAR},
+      </if>
+      <if test="adminName != null" >
+        admin_name = #{adminName,jdbcType=VARCHAR},
+      </if>
+      <if test="adminSex != null" >
+        admin_sex = #{adminSex,jdbcType=CHAR},
+      </if>
+      <if test="adminHeadImage != null" >
+        admin_head_image = #{adminHeadImage,jdbcType=VARCHAR},
+      </if>
+      <if test="adminMobile != null" >
+        admin_mobile = #{adminMobile,jdbcType=VARCHAR},
+      </if>
+      <if test="createId != null" >
+        create_id = #{createId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=CHAR},
+      </if>
+      <if test="updateId != null" >
+        update_id = #{updateId,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=CHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=CHAR},
+      </if>
+    </set>
+    where admin_id = #{adminId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.dh.model.AdminInfo" >
+    update admin_info
+    set admin_login_name = #{adminLoginName,jdbcType=VARCHAR},
+      admin_login_pwd = #{adminLoginPwd,jdbcType=VARCHAR},
+      admin_name = #{adminName,jdbcType=VARCHAR},
+      admin_sex = #{adminSex,jdbcType=CHAR},
+      admin_head_image = #{adminHeadImage,jdbcType=VARCHAR},
+      admin_mobile = #{adminMobile,jdbcType=VARCHAR},
+      create_id = #{createId,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=CHAR},
+      update_id = #{updateId,jdbcType=INTEGER},
+      update_time = #{updateTime,jdbcType=CHAR},
+      status = #{status,jdbcType=CHAR}
+    where admin_id = #{adminId,jdbcType=INTEGER}
+  </update>
+</mapper>
